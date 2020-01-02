@@ -1,0 +1,48 @@
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 3000
+const category = require('./models/category')
+const product = require('./models/product')
+
+const db = require('knex')({
+    client: 'mysql2',
+    connection: {
+        host: '127.0.0.1',
+        user: 'root',
+        password: 'masterkey',
+        database: 'devshop'
+    }
+})
+
+db.on('query', query => {
+    console.log('SQL: ', query.sql)
+})
+
+app.set('view engine', 'ejs')
+app.use(express.static('public'))
+
+app.get('/', async (req, res) => {
+    const categories = await getCategories()
+    res.render('home', {
+        categories
+    })
+})
+
+app.get('/categories/:id/:slug', async (req, res) => {
+    const categories = await category.getCategories(db)()
+    const products = await product.getProductsByCategoryId(db)(req.params.id)
+    const cat = await category.getCategory(db)(req.params.id)
+    res.render('category', {
+        categories,
+        products,
+        category: cat[0]
+    })
+})
+
+app.listen(port, err => {
+    if (err) {
+        console.log('err', err)
+    } else {
+        console.log('DevShop listening in port ' + port)
+    }
+})
