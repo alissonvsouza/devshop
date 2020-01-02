@@ -21,29 +21,30 @@ db.on('query', query => {
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
-app.get('/', async (req, res) => {
+app.use(async (req, res, next) => {
     const categories = await category.getCategories(db)()
-    res.render('home', {
+    res.locals = {
         categories
-    })
+    }
+    next()
+})
+
+app.get('/', async (req, res) => {
+    res.render('home')
 })
 
 app.get('/categories/:id/:slug', async (req, res) => {
-    const categories = await category.getCategories(db)()
     const products = await product.getProductsByCategoryId(db)(req.params.id)
     const cat = await category.getCategory(db)(req.params.id)
     res.render('category', {
-        categories,
         products,
         category: cat[0]
     })
 })
 
 app.get('/products/:id/:slug', async (req, res) => {
-    const categories = await category.getCategories(db)()
     const prod = await product.getProductById(db)(req.params.id)
     res.render('product-details', {
-        categories,
         product: prod[0]
     })
 })
