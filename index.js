@@ -22,7 +22,7 @@ app.set('view engine', 'ejs')
 app.use(express.static('public'))
 
 app.get('/', async (req, res) => {
-    const categories = await getCategories()
+    const categories = await category.getCategories(db)()
     res.render('home', {
         categories
     })
@@ -36,6 +36,15 @@ app.get('/categories/:id/:slug', async (req, res) => {
         categories,
         products,
         category: cat[0]
+    })
+})
+
+app.get('/products/:id/:slug', async (req, res) => {
+    const categories = await category.getCategories(db)()
+    const prod = await product.getProductById(db)(req.params.id)
+    res.render('product-details', {
+        categories,
+        product: prod[0]
     })
 })
 
