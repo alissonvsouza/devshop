@@ -2,7 +2,10 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 const category = require('./models/category')
-const product = require('./models/product')
+
+const categories = require('./controllers/categories')
+const products = require('./controllers/products')
+const home = require('./controllers/home')
 
 const db = require('knex')({
     client: 'mysql2',
@@ -29,25 +32,9 @@ app.use(async (req, res, next) => {
     next()
 })
 
-app.get('/', async (req, res) => {
-    res.render('home')
-})
-
-app.get('/categories/:id/:slug', async (req, res) => {
-    const products = await product.getProductsByCategoryId(db)(req.params.id)
-    const cat = await category.getCategory(db)(req.params.id)
-    res.render('category', {
-        products,
-        category: cat[0]
-    })
-})
-
-app.get('/products/:id/:slug', async (req, res) => {
-    const prod = await product.getProductById(db)(req.params.id)
-    res.render('product-details', {
-        product: prod[0]
-    })
-})
+app.get('/', home.getIndex)
+app.get('/categories/:id/:slug', categories.getCategory(db))
+app.get('/products/:id/:slug', products.getProduct(db))
 
 app.listen(port, err => {
     if (err) {
