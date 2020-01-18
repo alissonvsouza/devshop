@@ -11,7 +11,7 @@ const initialUser = db => async () => {
     if (row[0].count === 0) {
         const user = {
             name: 'Admin',
-            email: 'admin@devpleno.com.br',
+            email: 'admin@devshop.com.br',
             passwd: generatePassHash('123456'),
             email_checked: true,
             created: new Date(),
@@ -21,6 +21,17 @@ const initialUser = db => async () => {
         await db('users').insert(user)
     }
 }
+const login = db => async (email, passwd) => {
+    const user = await db('users').select('*').where('email', email)
+    if (user.length === 0) {
+        throw new Error('Invalid user')
+    }
+    if(!bcrypt.compareSync(passwd, user[0].passwd)) {
+        throw new Error('Invalid user 2')
+    }
+    return user[0]
+}
 module.exports = {
-    initialUser
+    initialUser,
+    login
 }
