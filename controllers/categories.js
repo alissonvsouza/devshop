@@ -9,6 +9,15 @@ const getCategory = db => async (req, res) => {
         category: cat[0]
     })
 }
+
+const adminGetCategories = db => async (req, res) => {
+    const categories = await category.getCategories(db)()
+    res.render('admin/categories/index', {
+        categories
+    })
+}
+
 module.exports = {
-    getCategory
+    getCategory,
+    adminGetCategories
 }
