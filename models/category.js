@@ -4,7 +4,6 @@ const getCategory = db => async (id) => {
     const category = await db('categories').select('*').where('id', id)
     return category
 }
-
 const getCategories = (db) => async () => {
     const categories = await db('categories').select('*')
     const categoriesWithSlug = categories.map(category => {
